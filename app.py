@@ -362,8 +362,8 @@ with tab1:
             "🌍 Environmental Factors",
             ["High Temperature", "High Humidity", "Dusty Environment", "Vibration", "Corrosive Atmosphere", "Network Storm", "Power Fluctuations", "None"]
         )
-
-with col5:
+    
+    with col5:
         symptoms = st.multiselect(
             "🔍 Observed Symptoms", 
             ["Unusual Noise", "Overheating", "Reduced Performance", "Leaks", "Error Codes", "Smell", "Visual Damage", "Intermittent Operation", "High Error Rate", "Network Issues", "Slow Response", "Complete Failure"]
@@ -388,7 +388,6 @@ with col5:
 
     # Expert mode toggle
     st.session_state.expert_mode = st.checkbox("🔬 Expert Mode (Detailed Technical Analysis)")
-
     # Process diagnosis
     if st.button("🚀 Get AI Diagnosis", type="primary", use_container_width=True):
         if not api_key:
@@ -771,5 +770,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
 
 
