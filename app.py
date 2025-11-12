@@ -215,8 +215,8 @@ def get_learned_insights(equipment_type, symptoms, environment):
         if pattern_data['equipment_type'] == equipment_type:
             symptom_similarity = len(set(symptoms) & set(pattern_data['symptoms'])) if symptoms else 0
             env_similarity = len(set(environment) & set(pattern_data['environment'])) if environment else 0
-
-if symptom_similarity > 0 or env_similarity > 0:
+            
+            if symptom_similarity > 0 or env_similarity > 0:
                 pattern_data['similarity_score'] = symptom_similarity + env_similarity
                 relevant_patterns.append(pattern_data)
     
@@ -771,4 +771,5 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
 
