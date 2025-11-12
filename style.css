@@ -1,0 +1,149 @@
+/* Modern Dark Theme for Streamlit */
+.stApp {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #ffffff;
+}
+
+/* Sidebar styling */
+.css-1d391kg, .css-1lcbmhc {
+    background-color: #1e293b !important;
+    border-right: 1px solid #334155;
+}
+
+/* Main content area */
+.main .block-container {
+    background: transparent;
+    padding-top: 2rem;
+}
+
+/* Headers */
+h1, h2, h3 {
+    color: #f1f5f9 !important;
+    font-weight: 600 !important;
+}
+
+h1 {
+    background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Cards */
+.card {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: #10b981;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Buttons */
+.stButton button {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1.5rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.stButton button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Secondary buttons */
+.stButton button[kind="secondary"] {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%) !important;
+}
+
+/* Select boxes, text inputs */
+.stSelectbox, .stTextInput, .stTextArea, .stMultiselect {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 1px solid #475569 !important;
+    border-radius: 8px !important;
+}
+
+.stSelectbox div, .stTextInput input, .stTextArea textarea, .stMultiselect div {
+    color: #f1f5f9 !important;
+    background: transparent !important;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem !important;
+    gap: 0.5rem !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: transparent !important;
+    color: #94a3b8 !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 1rem !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+}
+
+/* File uploader */
+.stFileUploader {
+    border: 2px dashed #475569 !important;
+    border-radius: 12px !important;
+    padding: 2rem !important;
+    background: rgba(30, 41, 59, 0.5) !important;
+}
+
+/* Metrics */
+[data-testid="metric-container"] {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 1px solid #334155 !important;
+    border-radius: 8px !important;
+    color: #f1f5f9 !important;
+}
+
+/* Success, error, info messages */
+.stAlert {
+    border-radius: 8px !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
