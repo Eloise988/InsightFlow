@@ -526,80 +526,32 @@ with tab1:
                     
                     # Show learning impact
                     if get_learned_insights(equipment_type, symptoms, environment):
-                        st.success("🧠 **AI Learning Applied**: This diagnosis was enhanced with insights from similar historical cases!")
+                   # Process and display uploaded images
+st.session_state.uploaded_images = []
+image_analysis_results = []
 
 if uploaded_files:
-                        st.success("🖼️ **Image Analysis Integrated**: Visual evidence was incorporated into the diagnosis!")
-                    
-                    # Detailed analysis
-                    st.markdown("---")
-                    st.markdown("""
-                    <div class="card">
-                        <h2>🔬 Detailed Analysis & Recommendations</h2>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    st.markdown(response.text)
-                    
-                    # Quick actions
-                    st.markdown("---")
-                    st.markdown("""
-                    <div class="card">
-                        <h2>🚀 Quick Actions</h2>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    action_col1, action_col2, action_col3 = st.columns(3)
-                    
-                    with action_col1:
-                        if st.button("📋 Save to History", use_container_width=True):
-                            st.success("✅ Case saved to history!")
-                    
-                    with action_col2:
-                        st.download_button(
-                            label="📄 Export Report",
-                            data=response.text,
-                            file_name=f"insightflow_diagnosis_{case_data['id']}.txt",
-                            mime="text/plain",
-                            use_container_width=True
-                        )
-                    
-                    with action_col3:
-                        if st.button("🆕 New Diagnosis", use_container_width=True):
-                            st.rerun()
-                            
-                except Exception as e:
-                    st.error(f"❌ Analysis failed: {str(e)}")
-                    st.info("💡 Tip: Check your API key and try again. If issues persist, the AI service might be temporarily unavailable.")
-
-# Continue with the other tabs (Tab2, Tab3, Tab4) - keep your existing code for these
-# [Include your existing code for tabs 2, 3, and 4 here...]
-
-with tab2:
-    st.markdown("""
-    <div class="card">
-        <h2>📋 Case History</h2>
-        <p style="color: #94a3b8;">Review past maintenance cases and diagnoses</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.subheader("Uploaded Images")
+    cols = st.columns(min(3, len(uploaded_files)))
     
-    if not st.session_state.diagnosis_history:
-        st.info("📭 No cases yet. Complete your first diagnosis to see history here!")
-    else:
-        # Filter and search
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            search_term = st.text_input("🔍 Search cases...")
-        with col2:
-            equipment_filter = st.selectbox("Filter by equipment", ["All"] + list(set([case['equipment_type'] for case in st.session_state.diagnosis_history])))
-        
-        # Display cases
-        for case in reversed(st.session_state.diagnosis_history):
-            # Apply filters
-            if search_term and search_term.lower() not in str(case).lower():
-                continue
-            if equipment_filter != "All" and case['equipment_type'] != equipment_filter:
-                continue
+    for i, uploaded_file in enumerate(uploaded_files):
+        with cols[i % 3]:
+            st.image(uploaded_file, caption=f"Image {i+1}", use_column_width=True)
+            processed_image = process_uploaded_image(uploaded_file)
+            if processed_image:
+                st.session_state.uploaded_images.append(processed_image)
                 
-            with st.expander(f"Case #{case['id']} - {case['equipment_type']} ({case['timestamp'][:10]})"):
+                # Quick image analysis
+                with st.spinner(f"Analyzing image {i+1}..."):
+                    analysis = analyze_image_with_gemini(
+                        processed_image, 
+                        equipment_type,
+                        f"Equipment: {equipment_type}, Severity: {severity}"
+                    )
+                    image_analysis_results.append(analysis)
+                    
+                with st.expander(f"Image {i+1} Analysis"):
+                    st.write(analysis)
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     st.write(f"**Severity:** {case['severity']}")
@@ -770,6 +722,7 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 
