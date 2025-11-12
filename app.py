@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 import google.generativeai as genai
 import os
@@ -6,45 +7,92 @@ import json
 import re
 import base64
 from io import BytesIO
+from PIL import Image
+
+# Load custom CSS
+def load_css():
+    with open("style.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+load_css()
 
 # Set up the page
 st.set_page_config(
     page_title="InsightFlow - AI Maintenance Assistant",
     page_icon="🔧",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# Title and description
-st.title("🔧 InsightFlow - AI Maintenance Assistant")
-st.markdown("### *Multi-Modal Maintenance Diagnosis Powered by Google Gemini AI*")
+# Modern Header
+col1, col2 = st.columns([3, 1])
+with col1:
+    st.markdown("""
+    <div style="text-align: left;">
+        <h1>🔧 InsightFlow</h1>
+        <p style="font-size: 1.2rem; color: #94a3b8; margin-top: -10px;">
+        AI-Powered Maintenance Diagnosis
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+with col2:
+    st.markdown("""
+    <div style="text-align: right; padding: 10px; background: rgba(16, 185, 129, 0.1); 
+                border-radius: 10px; border: 1px solid #10b981;">
+        <div style="font-size: 0.9rem; color: #10b981;">🟢 SYSTEM ONLINE</div>
+        <div style="font-size: 0.8rem; color: #94a3b8;">Gemini AI Powered</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# Sidebar for API key and features
+# Sidebar with modern styling
 with st.sidebar:
-    st.header("🔑 Configuration")
-    api_key = st.text_input("Enter your Google AI Studio API Key:", type="password")
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-size: 1.5rem; font-weight: bold; color: #10b981;">⚙️</div>
+        <div style="font-size: 1.1rem; font-weight: 600;">Configuration</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # API Key Input
+    api_key = st.text_input("🔑 Google AI Studio API Key:", type="password", 
+                           placeholder="Enter your API key...")
     if api_key:
         os.environ['GOOGLE_API_KEY'] = api_key
         genai.configure(api_key=api_key)
         st.success("✅ API Key configured!")
     
     st.markdown("---")
-    st.header("📊 Quick Stats")
-    if 'diagnosis_history' in st.session_state:
-        st.metric("Cases Processed", len(st.session_state.diagnosis_history))
-    if 'learned_patterns' in st.session_state:
-        st.metric("Patterns Learned", len(st.session_state.learned_patterns))
-    st.metric("AI Model", "Gemini 1.5 Pro")
-    st.metric("Status", "🟢 Online")
+    
+    # Quick Stats
+    st.markdown("### 📊 Quick Stats")
+    col1, col2 = st.columns(2)
+    with col1:
+        if 'diagnosis_history' in st.session_state:
+            st.metric("Cases", len(st.session_state.diagnosis_history))
+        else:
+            st.metric("Cases", 0)
+    with col2:
+        if 'learned_patterns' in st.session_state:
+            st.metric("Patterns", len(st.session_state.learned_patterns))
+        else:
+            st.metric("Patterns", 0)
     
     st.markdown("---")
-    st.header("🎯 Features")
-    st.markdown("• 🤖 AI-Powered Diagnosis")
-    st.markdown("• 🖼️ Image Analysis") 
-    st.markdown("• 🧠 Learning from History")
-    st.markdown("• 🔧 Repair Instructions")
-    st.markdown("• ⚠️ Safety Alerts")
+    
+    # Features
+    st.markdown("### 🚀 Features")
+    features = [
+        "🤖 AI-Powered Diagnosis",
+        "🖼️ Multi-Modal Analysis", 
+        "🧠 Learning System",
+        "🔧 Repair Instructions",
+        "⚠️ Safety Alerts"
+    ]
+    for feature in features:
+        st.markdown(f"<div style='padding: 5px 0;'>{feature}</div>", unsafe_allow_html=True)
 
-# Initialize session state with learning capabilities
+# Initialize session state
 if 'diagnosis_history' not in st.session_state:
     st.session_state.diagnosis_history = []
 if 'expert_mode' not in st.session_state:
@@ -56,21 +104,15 @@ if 'equipment_insights' not in st.session_state:
 if 'uploaded_images' not in st.session_state:
     st.session_state.uploaded_images = []
 
-# Image processing functions
+# Your existing functions here (keep all your existing functions exactly as they were)
 def process_uploaded_image(uploaded_file):
     """Process uploaded image and return PIL Image object"""
     try:
-        from PIL import Image
         image = Image.open(uploaded_file)
-        
-        # Convert to RGB if necessary
         if image.mode in ('RGBA', 'P'):
             image = image.convert('RGB')
-            
-        # Resize if too large (for performance)
         max_size = (1024, 1024)
         image.thumbnail(max_size, Image.Resampling.LANCZOS)
-        
         return image
     except Exception as e:
         st.error(f"❌ Error processing image: {str(e)}")
@@ -80,7 +122,6 @@ def analyze_image_with_gemini(image, equipment_type, context):
     """Analyze image using Gemini Vision"""
     try:
         model = genai.GenerativeModel('gemini-1.5-pro-latest')
-        
         prompt = f"""
         Analyze this {equipment_type} image for maintenance issues.
         
@@ -95,14 +136,11 @@ def analyze_image_with_gemini(image, equipment_type, context):
         
         Provide specific, actionable observations.
         """
-        
         response = model.generate_content([prompt, image])
         return response.text
-        
     except Exception as e:
         return f"❌ Image analysis failed: {str(e)}"
 
-# Learning functions (same as before)
 def extract_key_issues(diagnosis_text):
     """Extract key issues from diagnosis for learning"""
     issues = []
@@ -112,11 +150,9 @@ def extract_key_issues(diagnosis_text):
         r'[Ii]ssue[s]?[:\s]+([^\.]+)',
         r'[Ff]ault[s]?[:\s]+([^\.]+)'
     ]
-    
     for pattern in patterns:
         matches = re.findall(pattern, diagnosis_text)
         issues.extend(matches)
-    
     return issues[:3]
 
 def learn_from_case(equipment_type, symptoms, environment, diagnosis_text, severity, has_images=False):
@@ -140,7 +176,6 @@ def learn_from_case(equipment_type, symptoms, environment, diagnosis_text, sever
             if issue not in st.session_state.learned_patterns[pattern_key]['common_issues']:
                 st.session_state.learned_patterns[pattern_key]['common_issues'].append(issue)
                 
-        # Track if images were useful
         if has_images:
             st.session_state.learned_patterns[pattern_key]['has_images'] = True
                 
@@ -180,8 +215,8 @@ def get_learned_insights(equipment_type, symptoms, environment):
         if pattern_data['equipment_type'] == equipment_type:
             symptom_similarity = len(set(symptoms) & set(pattern_data['symptoms'])) if symptoms else 0
             env_similarity = len(set(environment) & set(pattern_data['environment'])) if environment else 0
-            
-            if symptom_similarity > 0 or env_similarity > 0:
+
+if symptom_similarity > 0 or env_similarity > 0:
                 pattern_data['similarity_score'] = symptom_similarity + env_similarity
                 relevant_patterns.append(pattern_data)
     
@@ -204,18 +239,22 @@ def enhance_prompt_with_learning(base_prompt, equipment_type, symptoms, environm
             """
         learning_section += "\nConsider these patterns in your analysis."
     
-    # Add image analysis if available
     image_section = ""
     if image_analysis:
         image_section = f"\n\n📷 **IMAGE ANALYSIS RESULTS:**\n{image_analysis}\n\nIntegrate these visual observations with the text description."
     
     return base_prompt + learning_section + image_section
 
-# Main application tabs
+# Main application tabs with modern styling
 tab1, tab2, tab3, tab4 = st.tabs(["🔍 New Diagnosis", "📋 Case History", "🧠 AI Learning", "⚙️ Settings"])
 
 with tab1:
-    st.header("🆕 New Maintenance Case")
+    st.markdown("""
+    <div class="card">
+        <h2>🆕 New Maintenance Case</h2>
+        <p style="color: #94a3b8;">Complete the form below to get AI-powered diagnosis</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Equipment information in columns
     col1, col2, col3 = st.columns(3)
@@ -242,13 +281,18 @@ with tab1:
         )
 
     # Image Upload Section
-    st.subheader("🖼️ Upload Equipment Images (Optional)")
+    st.markdown("""
+    <div class="card">
+        <h3>🖼️ Upload Equipment Images</h3>
+        <p style="color: #94a3b8;">Upload clear photos showing the issue (optional but recommended)</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     uploaded_files = st.file_uploader(
-        "Upload images of the equipment:",
+        "Choose images...",
         type=['jpg', 'jpeg', 'png', 'bmp'],
         accept_multiple_files=True,
-        help="Upload clear photos showing the issue, damage, or overall equipment condition"
+        label_visibility="collapsed"
     )
     
     # Process and display uploaded images
@@ -279,10 +323,15 @@ with tab1:
                         st.write(analysis)
 
     # Enhanced issue description
-    st.subheader("📝 Issue Description")
+    st.markdown("""
+    <div class="card">
+        <h3>📝 Issue Description</h3>
+        <p style="color: #94a3b8;">Provide detailed information for better diagnosis</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     issue_description = st.text_area(
-        "Describe the issue in detail:",
+        "Describe the issue:",
         placeholder="""🚨 FOR BEST RESULTS - Describe:
 
 • WHAT: Specific symptoms you're seeing
@@ -292,8 +341,7 @@ with tab1:
 • RECENT CHANGES: Any recent maintenance or environmental changes?
 • ERROR CODES: Specific codes or warning messages""",
         height=150,
-        help="💡 Tip: Be specific! Include error codes, timing, and impact details.",
-        key="issue_input"
+        label_visibility="collapsed"
     )
     
     # Real-time feedback
@@ -307,19 +355,17 @@ with tab1:
             st.success(f"✅ Excellent detail! ({char_count} characters)")
 
     # Additional context
-    st.subheader("🔍 Additional Context")
-    
     col4, col5 = st.columns(2)
     
     with col4:
         environment = st.multiselect(
-            "Environmental Factors",
+            "🌍 Environmental Factors",
             ["High Temperature", "High Humidity", "Dusty Environment", "Vibration", "Corrosive Atmosphere", "Network Storm", "Power Fluctuations", "None"]
         )
-    
-    with col5:
+
+with col5:
         symptoms = st.multiselect(
-            "Observed Symptoms", 
+            "🔍 Observed Symptoms", 
             ["Unusual Noise", "Overheating", "Reduced Performance", "Leaks", "Error Codes", "Smell", "Visual Damage", "Intermittent Operation", "High Error Rate", "Network Issues", "Slow Response", "Complete Failure"]
         )
 
@@ -327,7 +373,11 @@ with tab1:
     if equipment_type and (symptoms or environment):
         insights = get_learned_insights(equipment_type, symptoms, environment)
         if insights:
-            st.subheader("🧠 Learning Insights")
+            st.markdown("""
+            <div class="card">
+                <h3>🧠 Learning Insights</h3>
+            </div>
+            """, unsafe_allow_html=True)
             for insight in insights:
                 image_info = " 📷" if insight.get('has_images') else ""
                 st.info(f"""
@@ -459,7 +509,11 @@ with tab1:
                     st.balloons()
                     
                     # Results header with metrics
-                    st.subheader("📊 Diagnosis Summary")
+                    st.markdown("""
+                    <div class="card">
+                        <h2>📊 Diagnosis Summary</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
                     
                     col1, col2, col3, col4 = st.columns(4)
                     with col1:
@@ -474,18 +528,26 @@ with tab1:
                     # Show learning impact
                     if get_learned_insights(equipment_type, symptoms, environment):
                         st.success("🧠 **AI Learning Applied**: This diagnosis was enhanced with insights from similar historical cases!")
-                    
-                    if uploaded_files:
+
+if uploaded_files:
                         st.success("🖼️ **Image Analysis Integrated**: Visual evidence was incorporated into the diagnosis!")
                     
                     # Detailed analysis
                     st.markdown("---")
-                    st.subheader("🔬 Detailed Analysis & Recommendations")
+                    st.markdown("""
+                    <div class="card">
+                        <h2>🔬 Detailed Analysis & Recommendations</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
                     st.markdown(response.text)
                     
                     # Quick actions
                     st.markdown("---")
-                    st.subheader("🚀 Quick Actions")
+                    st.markdown("""
+                    <div class="card">
+                        <h2>🚀 Quick Actions</h2>
+                    </div>
+                    """, unsafe_allow_html=True)
                     action_col1, action_col2, action_col3 = st.columns(3)
                     
                     with action_col1:
@@ -509,4 +571,153 @@ with tab1:
                     st.error(f"❌ Analysis failed: {str(e)}")
                     st.info("💡 Tip: Check your API key and try again. If issues persist, the AI service might be temporarily unavailable.")
 
-# ... (rest of the tabs remain the same as previous version, just update requirements.txt)
+# Continue with the other tabs (Tab2, Tab3, Tab4) - keep your existing code for these
+# [Include your existing code for tabs 2, 3, and 4 here...]
+
+with tab2:
+    st.markdown("""
+    <div class="card">
+        <h2>📋 Case History</h2>
+        <p style="color: #94a3b8;">Review past maintenance cases and diagnoses</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if not st.session_state.diagnosis_history:
+        st.info("📭 No cases yet. Complete your first diagnosis to see history here!")
+    else:
+        # Filter and search
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            search_term = st.text_input("🔍 Search cases...")
+        with col2:
+            equipment_filter = st.selectbox("Filter by equipment", ["All"] + list(set([case['equipment_type'] for case in st.session_state.diagnosis_history])))
+        
+        # Display cases
+        for case in reversed(st.session_state.diagnosis_history):
+            # Apply filters
+            if search_term and search_term.lower() not in str(case).lower():
+                continue
+            if equipment_filter != "All" and case['equipment_type'] != equipment_filter:
+                continue
+                
+            with st.expander(f"Case #{case['id']} - {case['equipment_type']} ({case['timestamp'][:10]})"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.write(f"**Severity:** {case['severity']}")
+                with col2:
+                    st.write(f"**Urgency:** {case['urgency']}")
+                with col3:
+                    st.write(f"**Images:** {case['images_count']}")
+                
+                st.write(f"**Issue:** {case['issue_description'][:200]}...")
+                
+                if st.button(f"View Full Analysis", key=f"view_{case['id']}"):
+                    st.markdown(case['diagnosis'])
+                
+                if st.button(f"Delete Case", key=f"delete_{case['id']}"):
+                    st.session_state.diagnosis_history = [c for c in st.session_state.diagnosis_history if c['id'] != case['id']]
+                    st.rerun()
+
+with tab3:
+    st.markdown("""
+    <div class="card">
+        <h2>🧠 AI Learning Insights</h2>
+        <p style="color: #94a3b8;">See what the AI has learned from your cases</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if not st.session_state.learned_patterns:
+        st.info("🤖 AI hasn't learned any patterns yet. Complete a few diagnoses to see insights here!")
+    else:
+        st.markdown("""
+        <div class="card">
+            <h3>📊 Learning Statistics</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Patterns", len(st.session_state.learned_patterns))
+        with col2:
+            total_cases = sum([pattern['count'] for pattern in st.session_state.learned_patterns.values()])
+            st.metric("Total Cases Learned", total_cases)
+        with col3:
+            patterns_with_images = sum([1 for pattern in st.session_state.learned_patterns.values() if pattern.get('has_images')])
+            st.metric("Patterns with Images", patterns_with_images)
+        
+        st.markdown("""
+        <div class="card">
+            <h3>🔍 Learned Patterns</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        for pattern_key, pattern_data in list(st.session_state.learned_patterns.items())[:10]:
+            with st.expander(f"Pattern: {pattern_data['equipment_type']} (Seen {pattern_data['count']} times)"):
+                st.write(f"**Symptoms:** {', '.join(pattern_data['symptoms']) if pattern_data['symptoms'] else 'None'}")
+                st.write(f"**Environment:** {', '.join(pattern_data['environment']) if pattern_data['environment'] else 'Normal'}")
+                st.write(f"**Common Issues:** {', '.join(pattern_data['common_issues'][:3])}")
+                st.write(f"**Severity Distribution:** {pattern_data['severity_dist']}")
+                if pattern_data.get('has_images'):
+                    st.write("✅ **Uses image analysis**")
+        
+        st.markdown("""
+        <div class="card">
+            <h3>🏭 Equipment Insights</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        for equipment, insights in st.session_state.equipment_insights.items():
+            with st.expander(f"{equipment} ({insights['total_cases']} cases)"):
+                st.write(f"**First Case:** {insights['first_case'][:10]}")
+                st.write(f"**Cases with Images:** {insights.get('cases_with_images', 0)}")
+                if 'common_symptoms' in insights:
+                    from collections import Counter
+                    symptom_counts = Counter(insights['common_symptoms'])
+                    st.write("**Most Common Symptoms:**")
+                    for symptom, count in symptom_counts.most_common(5):
+                        st.write(f"  - {symptom}: {count} times")
+
+with tab4:
+    st.markdown("""
+    <div class="card">
+        <h2>⚙️ Settings & Configuration</h2>
+        <p style="color: #94a3b8;">Manage your application settings and data</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="card">
+        <h3>🔧 Application Settings</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Clear data option
+    if st.button("🗑️ Clear All History", type="secondary"):
+        if st.checkbox("I'm sure I want to delete all history and learned patterns"):
+            st.session_state.diagnosis_history = []
+            st.session_state.learned_patterns = {}
+            st.session_state.equipment_insights = {}
+            st.success("✅ All data cleared!")
+    
+    st.markdown("""
+    <div class="card">
+        <h3>📊 Export Data</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("📄 Export Case History", use_container_width=True):
+            if st.session_state.diagnosis_history:
+                import json
+                history_json = json.dumps(st.session_state.diagnosis_history, indent=2)
+                st.download_button(
+                    label="Download JSON",
+                    data=history_json,
+                    file_name="insightflow_case_history.json",
+                    mime="application/json"
+                )
+            else:
+                st.warning("No case history to export")
+    
+    with col2:
+        if
+```
