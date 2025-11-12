@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 import google.generativeai as genai
 import os
@@ -718,6 +718,57 @@ with tab4:
             else:
                 st.warning("No case history to export")
     
-    with col2:
-        if
-```
+
+with col2:
+        if st.button("🧠 Export Learned Patterns", use_container_width=True):
+            if st.session_state.learned_patterns:
+                patterns_json = json.dumps(st.session_state.learned_patterns, indent=2)
+                st.download_button(
+                    label="Download Patterns",
+                    data=patterns_json,
+                    file_name="insightflow_learned_patterns.json",
+                    mime="application/json"
+                )
+            else:
+                st.warning("No learned patterns to export")
+    
+    st.markdown("""
+    <div class="card">
+        <h3>ℹ️ About InsightFlow</h3>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    **InsightFlow - AI Maintenance Assistant**
+    
+    **Version 1.0**  
+    Powered by Google Gemini AI
+    
+    **Features:**
+    - 🤖 AI-powered maintenance diagnosis
+    - 🖼️ Multi-modal image analysis  
+    - 🧠 Continuous learning from cases
+    - 📊 Historical case tracking
+    - 🔧 Expert-level recommendations
+    
+    **Built with:** Streamlit & Google Generative AI
+    """)
+
+# Add some custom CSS for better styling
+st.markdown("""
+<style>
+    .main-header {
+        font-size: 2.5rem;
+        color: #1f77b4;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    .metric-card {
+        background-color: #f0f2f6;
+        padding: 1rem;
+        border-radius: 10px;
+        border-left: 4px solid #1f77b4;
+    }
+</style>
+""", unsafe_allow_html=True)
+
