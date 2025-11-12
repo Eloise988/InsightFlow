@@ -28,7 +28,7 @@ with st.sidebar:
     st.header("📊 Quick Stats")
     if 'diagnosis_history' in st.session_state:
         st.metric("Cases Processed", len(st.session_state.diagnosis_history))
-    st.metric("AI Model", "Gemini Pro")
+    st.metric("AI Model", "Gemini 1.5 Pro")
     st.metric("Status", "🟢 Online")
     
     st.markdown("---")
@@ -58,7 +58,7 @@ with tab1:
         equipment_type = st.selectbox(
             "🏭 Equipment Type",
             ["HVAC System", "Electrical Panel", "Mechanical Equipment", 
-             "Plumbing System", "Structural Component", "Industrial Machine", "Vehicle", "Other"]
+             "Plumbing System", "Structural Component", "Industrial Machine", "Vehicle", "Network Equipment", "Other"]
         )
     
     with col2:
@@ -99,7 +99,7 @@ with tab1:
     with col5:
         symptoms = st.multiselect(
             "Observed Symptoms", 
-            ["Unusual Noise", "Overheating", "Reduced Performance", "Leaks", "Error Codes", "Smell", "Visual Damage", "Intermittent Operation"]
+            ["Unusual Noise", "Overheating", "Reduced Performance", "Leaks", "Error Codes", "Smell", "Visual Damage", "Intermittent Operation", "High Error Rate", "Network Issues"]
         )
 
     # Expert mode toggle
@@ -114,7 +114,8 @@ with tab1:
         else:
             with st.spinner("🔍 AI is analyzing the issue... This may take 20-30 seconds"):
                 try:
-                    model = genai.GenerativeModel('gemini-pro')
+                    # FIXED: Use correct model name
+                    model = genai.GenerativeModel('gemini-1.5-pro-latest')
                     
                     # Enhanced prompt for better diagnosis
                     base_prompt = f"""
